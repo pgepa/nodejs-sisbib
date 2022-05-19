@@ -12,6 +12,6 @@ router.get('/', (req, res) => {
 });
 
 router.use('/api/obras', obraRoutes);
-router.use('/api/users', userRoutes);
+router.use('/api/usuarios', userRoutes);
 
 module.exports = router;

@@ -5,7 +5,7 @@ const Obra = db.Obra;
 const User = db.user;
 
 const allAccess = (req, res) => {
-    res.status(200).send('Consulta às obras da base');
+    res.status(200).send('<h1 class="container" style="font-family:Arial;">Página Inicial do Usuário Visitante</h1>');
 }
 
 const userBoard = (req, res) => {

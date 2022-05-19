@@ -1,7 +1,7 @@
 'use strict';
 
 const db = require('../models');
-const Certificate = db.certificate;
+const Obra = db.obra;
 const Op = db.Sequelize.Op;
 
 // Criar e salvar uma nova obra
