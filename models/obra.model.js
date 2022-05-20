@@ -54,10 +54,6 @@ module.exports = (sequelize, DataTypes) => {
         registro: {
             type: DataTypes.STRING,
             allowNull: false
-        },
-        periodicidade: {
-            type: DataTypes.STRING,
-            allowNull: false
         }
     });
     return Obra;
