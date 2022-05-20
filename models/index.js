@@ -10,6 +10,11 @@ const sequelize = new Sequelize(
     config.USER,
     config.PASSWORD,
     {
+        define: {
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_unicode_520_ci',
+            timestamps: true
+        },
         host: config.HOST,
         dialect: config.dialect,
         logging: console.log,

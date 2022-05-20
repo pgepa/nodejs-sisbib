@@ -48,13 +48,16 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         descritores: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT,
             allowNull: false
         },
         registro: {
             type: DataTypes.STRING,
             allowNull: false
         }
+    }, {
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_unicode_520_ci'
     });
     return Obra;
 };
