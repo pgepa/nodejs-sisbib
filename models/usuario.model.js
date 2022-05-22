@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-    const User = sequelize.define('usuario', {
+    const Usuario = sequelize.define('usuario', {
         id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
@@ -35,5 +35,5 @@ module.exports = (sequelize, DataTypes) => {
         charset: 'utf8mb4',
         collate: 'utf8mb4_unicode_520_ci'
     });
-    return User;
+    return Usuario;
 };

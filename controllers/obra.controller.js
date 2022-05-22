@@ -46,7 +46,6 @@ const create = (req, res) => {
         });
 };
 
-
 // Encontra todas as obras da base
 const findAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
@@ -61,7 +60,6 @@ const findAll = (req, res) => {
         });
     });
 };
-
 
 // Consulta uma unica obra na base
 const findOne = (req, res) => {

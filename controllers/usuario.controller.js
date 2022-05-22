@@ -1,18 +1,59 @@
 'use strict';
 
 const db = require('../models');
-const Obra = db.Obra;
-const User = db.user;
+const Usuario = db.usuario;
+const Op = db.Sequelize.Op;
+
+// Criar e salvar um novo usuario
+const create = (req, res) => {
+    // Validate request
+    if (!req.body.title) {
+        res.status(400).send({
+            message: 'Conteúdo não pode ser vazio.'
+        });
+        return;
+    }
+
+    // Create a user
+    const usuario = {
+        inscription: req.body.inscription,
+        name: req.body.name,
+        department: req.body.department,
+        cpf: req.body.cpf,
+        workload: req.body.workload,
+        password: req.body.password
+    };
+
+    // Salva o usuario na base
+    Usuario.create(usuario)
+        .then((data) => {
+            res.status(200).send({
+                data: data,
+                message: 'Usuário cadastrada com sucesso.'
+            });
+        })
+        .catch((err) => {
+            res.status(500).send({
+                message: err.message || 'Erro ao inserir usuário.'
+            });
+        });
+};
 
 const allAccess = (req, res) => {
-    res.status(200).send('<h1 class="container" style="font-family:Arial;">Página Inicial do Usuário Visitante</h1>');
-}
+    res.status(200).send(
+        '<h1 class="container" style="font-family:Arial;">Página Inicial do Usuário Visitante</h1>'
+    );
+};
 
-const userBoard = (req, res) => {
-    Obra.findAll({
-        where: {
-            id: id
-        }
+const pageNotFound = (req, res) => {
+    res.status(200).send('Página não encontrada.');
+};
+
+const findAll = (req, res) => {
+    Usuario.findAll({
+        order: [
+            ['name', 'ASC']
+        ]
     })
     .then((data) => {
         res.status(200).send(data);
@@ -22,37 +63,18 @@ const userBoard = (req, res) => {
             message: err.message
         });
     });
-}
-
-const pageNotFound = (req, res) => {
-    res.status(200).send('Página não encontrada.');
-}
-
-const allUsers = (req, res) => {  
-    User.findAll({
-        order: [
-            ['name', 'ASC']
-        ]
-    }).then((data) => {
-        res.status(200).send(data);
-    })
-    .catch((err) => {
-        res.status(500).send({
-            message: err.message
-        });
-    });
-}
+};
 
 // find a single user from the database
 const findOne = (req, res) => {
     const id = req.params.id;
-    User.findByPk(id)
+    Usuario.findByPk(id)
     .then((data) => {
         res.status(200).send(data);
     })
     .catch((err) => {
         res.status(500).send({
-            message: `Erro ao consultar certificado com ID = ${id}`
+            message: `Erro ao consultar usuário com ID = ${id}`
         });
     });
 };
@@ -61,15 +83,14 @@ const findOne = (req, res) => {
 const update = (req, res) => {
     const id = req.params.id;
     User.update(req.body, {
-        where: { id: id },
+        where: { id: id }
     })
     .then((num) => {
         if (num === 1) {
             res.send({
                 message: 'Usuário atualizado com sucesso.'
             });
-        }
-        else {
+        } else {
             res.send({
                 message: `Não foi possível atualizar o usuário ID = ${id}`
             });
@@ -86,7 +107,7 @@ const update = (req, res) => {
 const exclude = (req, res) => {
     const id = req.params.id;
     User.destroy({
-        where: { id: id },
+        where: { id: id }
     })
     .then(() => {
         res.status(200).send('Usuário excluído com sucesso.');
@@ -98,5 +119,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { allAccess, userBoard, pageNotFound,
-  allUsers, findOne, update, exclude };
+module.exports = { create, allAccess, pageNotFound, findAll, findOne, update,
+    exclude };
