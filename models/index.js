@@ -35,7 +35,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.DataTypes = DataTypes;
 
-db.user = userModel(sequelize, DataTypes);
+db.usuario = usuarioModel(sequelize, DataTypes);
 db.obra = obraModel(sequelize, DataTypes);
 
 module.exports = db;

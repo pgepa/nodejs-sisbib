@@ -9,7 +9,7 @@ obrasRouter.get('/:id', controller.findOne);
 
 obrasRouter.post('/add', controller.create);
 obrasRouter.post('/:id', controller.update);
-// retrieves some obras specified by user's inscription
+
 obrasRouter.post('/some', controller.findSome);
 
 obrasRouter.delete('/:id', controller.exclude);

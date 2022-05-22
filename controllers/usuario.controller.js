@@ -2,7 +2,6 @@
 
 const db = require('../models');
 const Usuario = db.usuario;
-const Op = db.Sequelize.Op;
 
 // Criar e salvar um novo usuario
 const create = (req, res) => {
@@ -14,7 +13,7 @@ const create = (req, res) => {
         return;
     }
 
-    // Create a user
+    // Cria um usuario
     const usuario = {
         inscription: req.body.inscription,
         name: req.body.name,
@@ -50,7 +49,12 @@ const pageNotFound = (req, res) => {
 };
 
 const findAll = (req, res) => {
+    const limit = parseInt(req.query.limit) || 20
+    const page = parseInt(req.query.page) || 1
+    const offset = (page - 1) * limit;
     Usuario.findAll({
+        limit: limit,
+        offset: offset,
         order: [
             ['name', 'ASC']
         ]
@@ -60,12 +64,12 @@ const findAll = (req, res) => {
     })
     .catch((err) => {
         res.status(500).send({
-            message: err.message
+            message: err.message || 'Erro ao consultar obra.'
         });
     });
 };
 
-// find a single user from the database
+// encontra um unico usuario na base
 const findOne = (req, res) => {
     const id = req.params.id;
     Usuario.findByPk(id)
@@ -82,7 +86,7 @@ const findOne = (req, res) => {
 // atualiza um usuário
 const update = (req, res) => {
     const id = req.params.id;
-    User.update(req.body, {
+    Usuario.update(req.body, {
         where: { id: id }
     })
     .then((num) => {
@@ -106,7 +110,7 @@ const update = (req, res) => {
 // exclui um usuário
 const exclude = (req, res) => {
     const id = req.params.id;
-    User.destroy({
+    Usuario.destroy({
         where: { id: id }
     })
     .then(() => {
