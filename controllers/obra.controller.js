@@ -77,9 +77,9 @@ const findOne = (req, res) => {
 
 // Retrieve some certificates from the database according to restriction
 const findSome = (req, res) => {
-    const id = req.body.id;
-    const condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
-    Certificate.findAll({ where: condition })
+    const termo = req.params.termo;
+    const condition = termo ? { descritores: { [Op.like]: `%${termo}%` } } : null;
+    Obra.findAll({ where: condition })
     .then((data) => {
         res.status(200).send(data);
     })
