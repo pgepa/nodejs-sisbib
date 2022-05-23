@@ -2,6 +2,7 @@
 
 const express = require('express');
 const app = express();
+const cors = require('cors');
 
 const db = require('./models');
 const dotenv = require('dotenv');
@@ -11,7 +12,7 @@ const routes = require('./routes');
 
 global.__basedir = __dirname;
 db.sequelize.sync();
-
+app.use(cors());
 const publicFolder = path.join(__dirname,'public');
 app.use(express.static(publicFolder));
 app.use(express.json());

@@ -64,7 +64,7 @@ const findAll = (req, res) => {
     })
     .catch((err) => {
         res.status(500).send({
-            message: err.message || 'Erro ao consultar obra.'
+            message: err.message || 'Erro ao consultar usuário.'
         });
     });
 };
