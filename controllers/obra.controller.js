@@ -77,9 +77,12 @@ const findOne = (req, res) => {
 
 // Retrieve some certificates from the database according to restriction
 const findSome = (req, res) => {
-    const termo = req.params.termo;
+    const limit = parseInt(req.query.limit) || 20
+    const page = parseInt(req.query.page) || 1
+    const offset = (page - 1) * limit;
+    const termo = req.body.termo;
     const condition = termo ? { descritores: { [Op.like]: `%${termo}%` } } : null;
-    Obra.findAll({ where: condition })
+    Obra.findAll({ limit, offset, where: condition })
     .then((data) => {
         res.status(200).send(data);
     })
