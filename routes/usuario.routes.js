@@ -8,7 +8,7 @@ usuariosRouter.get('/all', controller.findAll);
 usuariosRouter.get('/:id', controller.findOne);
 
 usuariosRouter.get('/404', controller.pageNotFound);
-
+usuariosRouter.post('/search', controller.findSome);
 usuariosRouter.post('/:id', controller.update);
 
 // delete a single certificate with id

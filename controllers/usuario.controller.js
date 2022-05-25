@@ -2,6 +2,7 @@
 
 const db = require('../models');
 const Usuario = db.usuario;
+const Op = db.Sequelize.Op;
 
 // Criar e salvar um novo usuario
 const create = (req, res) => {
@@ -83,6 +84,31 @@ const findOne = (req, res) => {
     });
 };
 
+// consulta alguns usuarios de acordo com o termo de busca
+const findSome = (req, res) => {
+    const limit = parseInt(req.query.limit) || 20
+    const page = parseInt(req.query.page) || 1
+    const offset = (page - 1) * limit;
+    const termo = req.body.termo;
+    const condition = termo ? {
+        [Op.or] : [
+            { inscription: { [Op.like]: `%${termo}%` } },
+            { name: { [Op.like]: `%${termo}%` } },
+            { department: { [Op.like]: `%${termo}%` } },
+            { cpf: { [Op.like]: `%${termo}%` }}
+        ]
+    } : null;
+    Usuario.findAll({ limit, offset, where: condition })
+    .then((data) => {
+        res.status(200).send(data);
+    })
+    .catch((err) => {
+        res.status(500).send({
+            message: err.message || 'Erro ao consultar obra.'
+        });
+    });
+};
+
 // atualiza um usuário
 const update = (req, res) => {
     const id = req.params.id;
@@ -123,5 +149,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, allAccess, pageNotFound, findAll, findOne, update,
-    exclude };
+module.exports = { create, allAccess, pageNotFound, findAll, findOne,
+    findSome, update, exclude };

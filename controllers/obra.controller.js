@@ -75,7 +75,7 @@ const findOne = (req, res) => {
     });
 };
 
-// Retrieve some certificates from the database according to restriction
+// consulta algumas obras de acordo com o termo de busca
 const findSome = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
