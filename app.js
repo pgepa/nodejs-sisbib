@@ -12,7 +12,11 @@ const routes = require('./routes');
 
 global.__basedir = __dirname;
 db.sequelize.sync();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:4000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false
+}));
 const publicFolder = path.join(__dirname,'public');
 app.use(express.static(publicFolder));
 app.use(express.json());
