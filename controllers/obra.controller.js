@@ -81,7 +81,15 @@ const findSome = (req, res) => {
     const page = parseInt(req.query.page) || 1
     const offset = (page - 1) * limit;
     const termo = req.body.termo;
-    const condition = termo ? { descritores: { [Op.like]: `%${termo}%` } } : null;
+    const condition = termo ? {
+        [Op.or] : [
+            { classificacao: { [Op.like]: `%${termo}%` } },
+            { autor: { [Op.like]: `%${termo}%` } },
+            { titulo: { [Op.like]: `%${termo}%` } },
+            { descritores: { [Op.like]: `%${termo}%` }},
+            { registro: { [Op.like]: `%${termo}%` } }
+        ]
+    } : null;
     Obra.findAll({ limit, offset, where: condition })
     .then((data) => {
         res.status(200).send(data);
