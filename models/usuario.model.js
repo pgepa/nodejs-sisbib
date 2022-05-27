@@ -23,10 +23,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        workload: {
-            type: DataTypes.FLOAT,
-            allowNull: false
-        },
         password: {
             type: DataTypes.STRING,
             allowNull: false

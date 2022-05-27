@@ -20,7 +20,6 @@ const create = (req, res) => {
         name: req.body.name,
         department: req.body.department,
         cpf: req.body.cpf,
-        workload: req.body.workload,
         password: req.body.password
     };
 
