@@ -10,9 +10,9 @@ usuariosRouter.get('/:id', controller.findOne);
 
 usuariosRouter.post('/add', controller.create);
 usuariosRouter.post('/search', controller.findSome);
-usuariosRouter.post('/:id', controller.update);
+usuariosRouter.post('/update', controller.update);
 
 // delete a single certificate with id
-usuariosRouter.delete('/:id', controller.exclude);
+usuariosRouter.delete('/delete', controller.exclude);
 
 module.exports = usuariosRouter;

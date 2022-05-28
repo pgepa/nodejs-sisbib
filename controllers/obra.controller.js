@@ -106,24 +106,25 @@ const pageNotFound = (req, res) => {
 
 // Atualiza uma obra pelo id na requisicao
 const update = (req, res) => {
-    const id = req.params.id;
+    const id = req.body.id;
     Obra.update(req.body, {
         where: { id: id },
     })
-    .then((code) => {
-        if (code == 1) {
-            res.send({
-                message: 'obra atualizada com sucesso.'
-            });
-        } else {
-            res.send({
-                message: `Não foi possível atualizar a obra com ID = ${id}`
-            });
-        }
+    .then((rowsUpdated) => {
+      if (Number(rowsUpdated) > 0) {
+        res.send({
+          message: 'Obra atualizada com sucesso.'
+        });
+      }
+      else {
+        res.send({
+          message: 'Erro ao atualizar obra.'
+        });
+      }
     })
     .catch((err) => {
         res.status(500).send({
-            message: `Erro ao atualizar a obra com ID = ${id}`
+            message: err.message || 'Erro ao atualizar obra.'
         });
     });
 };

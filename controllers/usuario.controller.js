@@ -3,6 +3,7 @@
 const db = require('../models');
 const Usuario = db.usuario;
 const Op = db.Sequelize.Op;
+const bcrypt = require('bcrypt');
 
 // Criar e salvar um novo usuario
 const create = (req, res) => {
@@ -21,7 +22,7 @@ const create = (req, res) => {
         department: req.body.department,
         email: req.body.email,
         cpf: req.body.cpf,
-        password: req.body.password
+        password: bcrypt.hashSync(req.body.password, 8)
     };
 
     // Salva o usuario na base
@@ -29,7 +30,7 @@ const create = (req, res) => {
         .then((data) => {
             res.status(200).send({
                 data: data,
-                message: 'Usuário cadastrada com sucesso.'
+                message: 'Usuário cadastrado com sucesso.'
             });
         })
         .catch((err) => {
@@ -111,24 +112,25 @@ const findSome = (req, res) => {
 
 // atualiza um usuário
 const update = (req, res) => {
-    const id = req.params.id;
+    const id = req.body.id;
     Usuario.update(req.body, {
         where: { id: id }
     })
-    .then((code) => {
-        if (code === 1) {
-            res.send({
-                message: 'Usuário atualizado com sucesso.'
-            });
-        } else {
-            res.send({
-                message: `Não foi possível atualizar o usuário ID = ${id}`
-            });
-        }
+    .then((rowsUpdated) => {
+      if (Number(rowsUpdated) > 0) {
+        res.send({
+          message: 'Usuário atualizado com sucesso.'
+        });
+      }
+      else {
+        res.send({
+          message: 'Erro ao atualizar usuário.'
+        });
+      }
     })
     .catch((err) => {
         res.status(500).send({
-            message: `Erro ao atualizar o usuário ID = ${id}`
+            message: err.message || 'Erro ao atualizar usuário.'
         });
     });
 };
