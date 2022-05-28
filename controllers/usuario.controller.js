@@ -6,19 +6,20 @@ const Op = db.Sequelize.Op;
 
 // Criar e salvar um novo usuario
 const create = (req, res) => {
-    // Validate request
-    if (!req.body.title) {
+    // Validar requisicao
+    if (!req.body.inscription) {
         res.status(400).send({
             message: 'Conteúdo não pode ser vazio.'
         });
         return;
     }
 
-    // Cria um usuario
+    // Criar um usuario
     const usuario = {
         inscription: req.body.inscription,
         name: req.body.name,
         department: req.body.department,
+        email: req.body.email,
         cpf: req.body.cpf,
         password: req.body.password
     };
@@ -114,8 +115,8 @@ const update = (req, res) => {
     Usuario.update(req.body, {
         where: { id: id }
     })
-    .then((num) => {
-        if (num === 1) {
+    .then((code) => {
+        if (code === 1) {
             res.send({
                 message: 'Usuário atualizado com sucesso.'
             });

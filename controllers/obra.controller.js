@@ -6,15 +6,15 @@ const Op = db.Sequelize.Op;
 
 // Criar e salvar uma nova obra
 const create = (req, res) => {
-    // Validate request
-    if (!req.body.title) {
+    // Validar requisicao
+    if (!req.body.titulo) {
         res.status(400).send({
             message: 'Conteúdo não pode ser vazio.'
         });
         return;
     }
 
-    // Create a certificate
+    // Propriedades do objeto obra
     const obra = {
         classificacao: req.body.classificacao,
         tipo_documental: req.body.tipo_documental,
@@ -27,11 +27,10 @@ const create = (req, res) => {
         idioma: req.body.idioma,
         paginas: req.body.paginas,
         descritores: req.body.descritores,
-        registro: req.body.registro,
-        periodicidade: req.body.periodicidade
+        registro: req.body.registro
     };
 
-    // Salva a obra na base
+    // Salvar a obra na base
     Obra.create(obra)
         .then((data) => {
             res.status(200).send({
@@ -46,7 +45,7 @@ const create = (req, res) => {
         });
 };
 
-// Encontra todas as obras da base
+// Encontrar todas as obras da base
 const findAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
@@ -101,16 +100,20 @@ const findSome = (req, res) => {
     });
 };
 
+const pageNotFound = (req, res) => {
+  res.status(200).send('Página não encontrada.');
+};
+
 // Atualiza uma obra pelo id na requisicao
 const update = (req, res) => {
     const id = req.params.id;
-    obra.update(req.body, {
+    Obra.update(req.body, {
         where: { id: id },
     })
-    .then((num) => {
-        if (num == 1) {
+    .then((code) => {
+        if (code == 1) {
             res.send({
-                message: 'obra atualizado com sucesso..'
+                message: 'obra atualizada com sucesso.'
             });
         } else {
             res.send({
@@ -141,4 +144,4 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, findAll, findOne, findSome, update, exclude };
+module.exports = { create, findAll, findOne, findSome, pageNotFound, update, exclude };

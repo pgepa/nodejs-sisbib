@@ -1,7 +1,7 @@
 'use strict';
 
 const config = require('../config/db.config');
-const obraModel = require('../models/obra.model');
+const obraModel = require('./obra.model');
 const usuarioModel = require('./usuario.model');
 
 const { Sequelize, DataTypes } = require('sequelize');
