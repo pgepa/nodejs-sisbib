@@ -4,9 +4,9 @@ const db = require('../models');
 const Obra = db.obra;
 const Op = db.Sequelize.Op;
 
-// Criar e salvar uma nova obra
+// Cria e salvar uma nova obra
 const create = (req, res) => {
-    // Validar requisicao
+    // Valida requisicao
     if (!req.body.titulo) {
         res.status(400).send({
             message: 'Conteúdo não pode ser vazio.'
@@ -30,7 +30,7 @@ const create = (req, res) => {
         registro: req.body.registro
     };
 
-    // Salvar a obra na base
+    // Salva a obra na base
     Obra.create(obra)
         .then((data) => {
             res.status(200).send({
@@ -45,7 +45,7 @@ const create = (req, res) => {
         });
 };
 
-// Encontrar todas as obras da base
+// Retorna todas as obras
 const findAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
@@ -74,7 +74,7 @@ const findOne = (req, res) => {
     });
 };
 
-// consulta algumas obras de acordo com o termo de busca
+// Consulta algumas obras de acordo com a condicao
 const findSome = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
@@ -101,10 +101,10 @@ const findSome = (req, res) => {
 };
 
 const pageNotFound = (req, res) => {
-  res.status(200).send('Página não encontrada.');
+  res.status(404).send('Página não encontrada.');
 };
 
-// Atualiza uma obra pelo id na requisicao
+// Atualiza uma obra de acordo com o id da requisicao
 const update = (req, res) => {
     const id = req.body.id;
     Obra.update(req.body, {
@@ -129,7 +129,7 @@ const update = (req, res) => {
     });
 };
 
-// Deleta uma obra com o id especificado pela requisicao
+// Exclui uma obra de acordo com o id da requisicao
 const exclude = (req, res) => {
     const id = req.params.id;
     Obra.destroy({

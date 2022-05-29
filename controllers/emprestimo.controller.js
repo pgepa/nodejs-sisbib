@@ -1,41 +1,41 @@
 'use strict';
 
 const db = require('../models');
-const Usuario = db.usuario;
+const Emprestimo = db.emprestimo;
 const Op = db.Sequelize.Op;
-const bcrypt = require('bcrypt');
 
 // Cria e salva um novo usuario
 const create = (req, res) => {
     // Valida requisicao
-    if (!req.body.inscription) {
+    if (!req.body.id_transacao) {
         res.status(400).send({
-            message: 'Conteúdo não pode ser vazio.'
+            message: 'ID da transação não pode ser vazio.'
         });
         return;
     }
 
-    // Cria um usuario
-    const usuario = {
-        inscription: req.body.inscription,
-        name: req.body.name,
-        department: req.body.department,
-        email: req.body.email,
-        cpf: req.body.cpf,
-        password: bcrypt.hashSync(req.body.password, 8)
+    // Cria um  emprestimo
+    const emprestimo = {
+        id_transacao: req.body.id_transacao,
+        id_funcionario: req.body.id_funcionario,
+        id_usuario: req.body.id_usuario,
+        id_obra: req.body.id_obra,
+        data_emprestimo: req.body.data_emprestimo,
+        data_prevista: req.body.data_prevista,
+        data_devolucao: req.body.data_devolucao
     };
 
-    // Salva o usuario na base
-    Usuario.create(usuario)
+    // Salva o emprestimo na base
+    Emprestimo.create(emprestimo)
         .then((data) => {
             res.status(200).send({
                 data: data,
-                message: 'Usuário cadastrado com sucesso.'
+                message: 'Empréstimo registrado com sucesso.'
             });
         })
         .catch((err) => {
             res.status(500).send({
-                message: err.message || 'Erro ao inserir usuário.'
+                message: err.message || 'Erro ao registrar empréstimo.'
             });
         });
 };
@@ -44,16 +44,16 @@ const pageNotFound = (req, res) => {
     res.status(404).send('Página não encontrada.');
 };
 
-// Retorna todos os usuarios
+// Retorna todos os emprestimos
 const findAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
     const offset = (page - 1) * limit;
-    Usuario.findAll({
+    Emprestimo.findAll({
         limit: limit,
         offset: offset,
         order: [
-            ['name', 'ASC']
+            ['id_transacao', 'ASC']
         ]
     })
     .then((data) => {
@@ -61,26 +61,26 @@ const findAll = (req, res) => {
     })
     .catch((err) => {
         res.status(500).send({
-            message: err.message || 'Erro ao consultar usuário.'
+            message: err.message || 'Erro ao consultar empréstimo.'
         });
     });
 };
 
-// Encontra um unico usuario na base
+// Encontra um unico emprestimo
 const findOne = (req, res) => {
     const id = req.params.id;
-    Usuario.findByPk(id)
+    Emprestimo.findByPk(id)
     .then((data) => {
         res.status(200).send(data);
     })
     .catch((err) => {
         res.status(500).send({
-            message: `Erro ao consultar usuário com ID = ${id}`
+            message: `Erro ao consultar empréstimo com ID = ${id}`
         });
     });
 };
 
-// Encontra alguns usuarios de acordo com o termo de busca
+// Encontra alguns emprestimos de acordo com o termo de busca
 const findSome = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
@@ -88,63 +88,62 @@ const findSome = (req, res) => {
     const termo = req.body.termo;
     const condition = termo ? {
         [Op.or] : [
-            { inscription: { [Op.like]: `%${termo}%` } },
-            { name: { [Op.like]: `%${termo}%` } },
-            { department: { [Op.like]: `%${termo}%` } },
-            { cpf: { [Op.like]: `%${termo}%` }}
+            { data_emprestimo: { [Op.like]: `%${termo}%` } },
+            { data_prevista: { [Op.like]: `%${termo}%` } },
+            { data_devolucao: { [Op.like]: `%${termo}%` } }
         ]
     } : null;
-    Usuario.findAll({ limit, offset, where: condition })
+    Emprestimo.findAll({ limit, offset, where: condition })
     .then((data) => {
         res.status(200).send(data);
     })
     .catch((err) => {
         res.status(500).send({
-            message: err.message || 'Erro ao consultar usuário.'
+            message: err.message || 'Erro ao consultar emprestimo.'
         });
     });
 };
 
-// Atualiza um usuario
+// Atualiza um emprestimo
 const update = (req, res) => {
     const id = req.body.id;
-    Usuario.update(req.body, {
+    Emprestimo.update(req.body, {
         where: { id: id }
     })
     .then((rowsUpdated) => {
       if (Number(rowsUpdated) > 0) {
         res.send({
-          message: 'Usuário atualizado com sucesso.'
+          message: 'Empréstimo atualizado com sucesso.'
         });
       }
       else {
         res.send({
-          message: 'Erro ao atualizar usuário.'
+          message: 'Erro ao atualizar empréstimo.'
         });
       }
     })
     .catch((err) => {
         res.status(500).send({
-            message: err.message || 'Erro ao atualizar usuário.'
+            message: err.message || 'Erro ao atualizar empréstimo.'
         });
     });
 };
 
-// Exclui um usuário
+// Exclui um emprestimo
 const exclude = (req, res) => {
     const id = req.params.id;
-    Usuario.destroy({
+    Emprestimo.destroy({
         where: { id: id }
     })
     .then(() => {
-        res.status(200).send('Usuário excluído com sucesso.');
+        res.status(200).send('Empréstimo excluído com sucesso.');
     })
     .catch((err) => {
         res.status(500).send({
-            message: `Não foi possível excluir o usuário com ID=${id}`
+            message: `Não foi possível excluir o empréstimo com ID=${id}`
         });
     });
 };
 
-module.exports = { create, pageNotFound, findAll, findOne,
-    findSome, update, exclude };
+module.exports = { create, pageNotFound, findAll, findOne, findSome,
+  update, exclude };

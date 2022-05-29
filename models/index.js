@@ -3,6 +3,7 @@
 const config = require('../config/db.config');
 const obraModel = require('./obra.model');
 const usuarioModel = require('./usuario.model');
+const emprestimoModel = require('./emprestimo.model');
 
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize(
@@ -37,5 +38,6 @@ db.DataTypes = DataTypes;
 
 db.usuario = usuarioModel(sequelize, DataTypes);
 db.obra = obraModel(sequelize, DataTypes);
+db.emprestimo = emprestimoModel(sequelize, DataTypes);
 
 module.exports = db;

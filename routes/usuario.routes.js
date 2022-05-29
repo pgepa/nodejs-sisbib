@@ -12,7 +12,6 @@ usuariosRouter.post('/add', controller.create);
 usuariosRouter.post('/search', controller.findSome);
 usuariosRouter.post('/update', controller.update);
 
-// delete a single certificate with id
 usuariosRouter.delete('/delete', controller.exclude);
 
 module.exports = usuariosRouter;

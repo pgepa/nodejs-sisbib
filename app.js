@@ -17,6 +17,7 @@ app.use(cors({
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false
 }));
+
 const publicFolder = path.join(__dirname,'public');
 app.use(express.static(publicFolder));
 app.use(express.json());
