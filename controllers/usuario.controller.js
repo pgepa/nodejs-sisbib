@@ -105,6 +105,28 @@ const findSome = (req, res) => {
     });
 };
 
+const findNames = (req, res) => {
+  const limit = parseInt(req.query.limit) || 20
+  const page = parseInt(req.query.page) || 1
+  const offset = (page - 1) * limit;
+  Usuario.findAll({
+      attributes: ['id', 'name'],
+      limit: limit,
+      offset: offset,
+      order: [
+          ['name', 'ASC']
+      ]
+  })
+  .then((data) => {
+      res.status(200).send(data);
+  })
+  .catch((err) => {
+      res.status(500).send({
+          message: err.message || 'Erro ao consultar usuário.'
+      });
+  });
+};
+
 // Atualiza um usuario
 const update = (req, res) => {
     const id = req.body.id;
@@ -147,4 +169,4 @@ const exclude = (req, res) => {
 };
 
 module.exports = { create, pageNotFound, findAll, findOne,
-    findSome, update, exclude };
+    findSome, findNames, update, exclude };

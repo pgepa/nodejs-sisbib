@@ -5,6 +5,7 @@ const usuariosRouter = express.Router();
 const controller = require('../controllers/usuario.controller');
 
 usuariosRouter.get('/all', controller.findAll);
+usuariosRouter.get('/names', controller.findNames);
 usuariosRouter.get('/404', controller.pageNotFound);
 usuariosRouter.get('/:id', controller.findOne);
 
