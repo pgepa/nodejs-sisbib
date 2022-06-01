@@ -19,12 +19,14 @@ const create = (req, res) => {
         id_transacao: req.body.id_transacao,
         nome_funcionario: req.body.nome_funcionario,
         nome_usuario: req.body.nome_usuario,
-        titulo_obra1: req.body.titulo_obra1,
-        titulo_obra2: req.body.titulo_obra2,
-        titulo_obra3: req.body.titulo_obra3,
+        registro_obra1: req.body.registro_obra1,
+        registro_obra2: req.body.registro_obra2,
+        registro_obra3: req.body.registro_obra3,
         data_emprestimo: req.body.data_emprestimo,
         data_prevista: req.body.data_prevista,
-        data_devolucao: req.body.data_devolucao
+        data_devolucao1: req.body.data_devolucao1,
+        data_devolucao2: req.body.data_devolucao2,
+        data_devolucao3: req.body.data_devolucao3
     };
 
     // Salva o emprestimo na base
@@ -92,9 +94,9 @@ const findSome = (req, res) => {
         [Op.or] : [
             { nome_funcionario: { [Op.like]: `%${termo}%` } },
             { nome_usuario: { [Op.like]: `%${termo}%` } },
-            { titulo_obra1: { [Op.like]: `%${termo}%` } },
-            { titulo_obra2: { [Op.like]: `%${termo}%` } },
-            { titulo_obra3: { [Op.like]: `%${termo}%` } }
+            { registro_obra1: { [Op.like]: `%${termo}%` } },
+            { registro_obra2: { [Op.like]: `%${termo}%` } },
+            { registro_obra3: { [Op.like]: `%${termo}%` } }
         ]
     } : null;
     Emprestimo.findAll({ limit, offset, where: condition })

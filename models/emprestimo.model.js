@@ -19,15 +19,15 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        titulo_obra1: {
+        registro_obra1: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        titulo_obra2: {
+        registro_obra2: {
             type: DataTypes.STRING,
             allowNull: true
         },
-        titulo_obra3: {
+        registro_obra3: {
             type: DataTypes.STRING,
             allowNull: true
         },
@@ -39,7 +39,15 @@ module.exports = (sequelize, DataTypes) => {
           type: DataTypes.DATEONLY,
           allowNull: false
         },
-        data_devolucao: {
+        data_devolucao1: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        },
+        data_devolucao2: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        },
+        data_devolucao3: {
             type: DataTypes.DATEONLY,
             allowNull: true
         }
