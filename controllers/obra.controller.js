@@ -50,7 +50,32 @@ const findAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
     const offset = (page - 1) * limit;
-    Obra.findAll({ limit, offset }).then((data) => {
+    Obra.findAll({
+        limit: limit,
+        offset: offset,
+        order: [
+            [ 'id', 'ASC' ]
+        ]
+    }).then((data) => {
+        res.status(200).send(data);
+    })
+    .catch((err) => {
+        res.status(500).send({
+            message: err.message || 'Erro ao consultar obra.'
+        });
+    });
+};
+
+// Retorna todas as obras
+const findReducedAll = (req, res) => {
+    const limit = parseInt(req.query.limit) || 20
+    const page = parseInt(req.query.page) || 1
+    const offset = (page - 1) * limit;
+    Obra.findAll({
+        attributes: ['id', 'classificacao', 'autor', 'titulo', 'descritores', 'registro'],
+        limit: limit,
+        offset: offset
+    }).then((data) => {
         res.status(200).send(data);
     })
     .catch((err) => {
@@ -145,4 +170,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, findAll, findOne, findSome, pageNotFound, update, exclude };
+module.exports = { create, findAll, findReducedAll, findOne,
+    findSome, pageNotFound, update, exclude };

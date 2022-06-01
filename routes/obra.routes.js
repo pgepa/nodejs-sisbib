@@ -5,6 +5,7 @@ const obrasRouter = express.Router();
 const controller = require('../controllers/obra.controller');
 
 obrasRouter.get('/all', controller.findAll);
+obrasRouter.get('/reducedall', controller.findReducedAll);
 obrasRouter.get('/404', controller.pageNotFound);
 obrasRouter.get('/:id', controller.findOne);
 
