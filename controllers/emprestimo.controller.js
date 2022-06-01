@@ -120,15 +120,10 @@ const update = (req, res) => {
           message: 'Empréstimo atualizado com sucesso.'
         });
       }
-      else {
-        res.send({
-          message: 'Erro ao atualizar empréstimo.'
-        });
-      }
     })
     .catch((err) => {
         res.status(500).send({
-            message: err.message || 'Erro ao atualizar empréstimo.'
+            message: err.message
         });
     });
 };
