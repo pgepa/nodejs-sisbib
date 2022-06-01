@@ -17,9 +17,11 @@ const create = (req, res) => {
     // Cria um  emprestimo
     const emprestimo = {
         id_transacao: req.body.id_transacao,
-        id_funcionario: req.body.id_funcionario,
-        id_usuario: req.body.id_usuario,
-        id_obra: req.body.id_obra,
+        nome_funcionario: req.body.nome_funcionario,
+        nome_usuario: req.body.nome_usuario,
+        titulo_obra1: req.body.titulo_obra1,
+        titulo_obra2: req.body.titulo_obra2,
+        titulo_obra3: req.body.titulo_obra3,
         data_emprestimo: req.body.data_emprestimo,
         data_prevista: req.body.data_prevista,
         data_devolucao: req.body.data_devolucao
@@ -88,9 +90,11 @@ const findSome = (req, res) => {
     const termo = req.body.termo;
     const condition = termo ? {
         [Op.or] : [
-            { data_emprestimo: { [Op.like]: `%${termo}%` } },
-            { data_prevista: { [Op.like]: `%${termo}%` } },
-            { data_devolucao: { [Op.like]: `%${termo}%` } }
+            { nome_funcionario: { [Op.like]: `%${termo}%` } },
+            { nome_usuario: { [Op.like]: `%${termo}%` } },
+            { titulo_obra1: { [Op.like]: `%${termo}%` } },
+            { titulo_obra2: { [Op.like]: `%${termo}%` } },
+            { titulo_obra3: { [Op.like]: `%${termo}%` } }
         ]
     } : null;
     Emprestimo.findAll({ limit, offset, where: condition })

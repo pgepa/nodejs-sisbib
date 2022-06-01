@@ -11,17 +11,25 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        id_funcionario: {
-            type: DataTypes.INTEGER,
+        nome_funcionario: {
+            type: DataTypes.STRING,
             allowNull: false
         },
-        id_usuario: {
-            type: DataTypes.INTEGER,
+        nome_usuario: {
+            type: DataTypes.STRING,
             allowNull: false
         },
-        id_obra: {
-            type: DataTypes.INTEGER,
+        titulo_obra1: {
+            type: DataTypes.STRING,
             allowNull: false
+        },
+        titulo_obra2: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        titulo_obra3: {
+            type: DataTypes.STRING,
+            allowNull: true
         },
         data_emprestimo: {
             type: DataTypes.DATEONLY,
