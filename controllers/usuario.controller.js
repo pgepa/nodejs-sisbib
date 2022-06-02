@@ -3,7 +3,7 @@
 const db = require('../models');
 const Usuario = db.usuario;
 const Op = db.Sequelize.Op;
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // Cria e salva um novo usuario
 const create = (req, res) => {

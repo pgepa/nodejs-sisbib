@@ -2,17 +2,26 @@
 
 const express = require('express');
 const usuariosRouter = express.Router();
+
+const authJwt = require('../middleware/authJwt');
 const controller = require('../controllers/usuario.controller');
 
-usuariosRouter.get('/all', controller.findAll);
-usuariosRouter.get('/names', controller.findNames);
+usuariosRouter.get('/all', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.findAll);
+usuariosRouter.get('/names', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.findNames);
 usuariosRouter.get('/404', controller.pageNotFound);
-usuariosRouter.get('/:id', controller.findOne);
+usuariosRouter.get('/:id', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.findOne);
 
-usuariosRouter.post('/add', controller.create);
-usuariosRouter.post('/search', controller.findSome);
-usuariosRouter.post('/update', controller.update);
+usuariosRouter.post('/add', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.create);
+usuariosRouter.post('/search', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.findSome);
+usuariosRouter.post('/update', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.update);
 
-usuariosRouter.delete('/delete', controller.exclude);
+usuariosRouter.delete('/delete', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.exclude);
 
 module.exports = usuariosRouter;

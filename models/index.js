@@ -4,6 +4,8 @@ const config = require('../config/db.config');
 const obraModel = require('./obra.model');
 const usuarioModel = require('./usuario.model');
 const emprestimoModel = require('./emprestimo.model');
+const roleModel = require('../models/role.model');
+const userRolesModel = require('../models/user_roles.model');
 
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize(
@@ -39,5 +41,21 @@ db.DataTypes = DataTypes;
 db.usuario = usuarioModel(sequelize, DataTypes);
 db.obra = obraModel(sequelize, DataTypes);
 db.emprestimo = emprestimoModel(sequelize, DataTypes);
+db.role = roleModel(sequelize, DataTypes);
+db.user_roles = userRolesModel(sequelize, DataTypes);
+
+db.role.belongsToMany(db.usuario, {
+    through: 'user_roles',
+    foreignKey: 'roleId',
+    otherKey: 'userId',
+});
+
+db.usuario.belongsToMany(db.role, {
+    through: 'user_roles',
+    foreignKey: 'userId',
+    otherKey: 'roleId',
+});
+
+db.ROLES = ['user', 'admin'];
 
 module.exports = db;
