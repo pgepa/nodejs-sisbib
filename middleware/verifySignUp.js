@@ -5,16 +5,16 @@ const ROLES = db.ROLES;
 const Usuario = db.usuario;
 
 const checkDuplicates = (req, res, next) => {
-    // Inscription
+    // Email
     Usuario.findOne({
         where: {
-            inscription: req.body.inscription
+            email: req.body.email
         }
     })
     .then((user) => {
         if (user) {
             res.status(400).send({
-                message: 'Erro. Matrícula já cadastrada.'
+                message: 'Erro. Email já cadastrado.'
             });
             return;
         }
