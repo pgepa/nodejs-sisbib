@@ -48,7 +48,7 @@ const signUp = (req, res) => {
 const signIn = (req, res) => { 
     Usuario.findOne({          
         where: {
-            inscription: req.body.inscription
+            email: req.body.email
         }
     })
     .then((user) => {
@@ -93,7 +93,7 @@ const signIn = (req, res) => {
 const changePass = (req, res) => {
     Usuario.findOne({
         where: {
-            inscription: req.body.inscription
+            email: req.body.email
         }
     })
     .then((user) => {
@@ -132,7 +132,7 @@ const changePass = (req, res) => {
 const changeNewPass = (req, res) => {
     Usuario.findOne({
         where: {
-            inscription: req.body.inscription
+            email: req.body.email
         }
     })
     .then((user) => {

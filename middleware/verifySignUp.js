@@ -32,7 +32,7 @@ const checkDuplicates = (req, res, next) => {
                 return;
             }
             // Name
-            User.findOne({
+            Usuario.findOne({
                 where: {
                     name: req.body.name
                 }
