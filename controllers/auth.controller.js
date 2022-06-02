@@ -47,9 +47,6 @@ const signUp = (req, res) => {
 }
 
 const signIn = (req, res) => {
-  console.log('Tentativa de acesso:');
-  console.log(`req.body.email = ${String(req.body.email)}`);
-  console.log(`req.body.password = ${req.body.password}`);
   Usuario.findOne({
     where: {
       email: req.body.email
@@ -70,7 +67,7 @@ const signIn = (req, res) => {
         });
       }
       const token = jwt.sign({ id: user.id }, config.secret, {
-        expiresIn: 300 // 5 mins
+        expiresIn: 86400 // 24 hours
       });
       const authorities = [];
       user.getRoles().then((roles) => {

@@ -14,8 +14,6 @@ usuariosRouter.get('/404', controller.pageNotFound);
 usuariosRouter.get('/:id', [authJwt.verifyToken, authJwt.isAdmin],
   controller.findOne);
 
-usuariosRouter.post('/add', [authJwt.verifyToken, authJwt.isAdmin],
-  controller.create);
 usuariosRouter.post('/search', [authJwt.verifyToken, authJwt.isAdmin],
   controller.findSome);
 usuariosRouter.post('/update', [authJwt.verifyToken, authJwt.isAdmin],

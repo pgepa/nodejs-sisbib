@@ -44,18 +44,18 @@ db.emprestimo = emprestimoModel(sequelize, DataTypes);
 db.role = roleModel(sequelize, DataTypes);
 db.user_roles = userRolesModel(sequelize, DataTypes);
 
+db.ROLES = ['user', 'admin'];
+
 db.role.belongsToMany(db.usuario, {
-    through: 'user_roles',
-    foreignKey: 'roleId',
-    otherKey: 'userId',
+  through: 'user_roles',
+  foreignKey: 'roleId',
+  otherKey: 'userId',
 });
 
 db.usuario.belongsToMany(db.role, {
-    through: 'user_roles',
-    foreignKey: 'userId',
-    otherKey: 'roleId',
+  through: 'user_roles',
+  foreignKey: 'userId',
+  otherKey: 'roleId',
 });
-
-db.ROLES = ['user', 'admin'];
 
 module.exports = db;
