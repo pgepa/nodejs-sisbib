@@ -22,11 +22,15 @@ const create = (req, res) => {
         registro_obra1: req.body.registro_obra1,
         registro_obra2: req.body.registro_obra2,
         registro_obra3: req.body.registro_obra3,
+        registro_obra4: req.body.registro_obra4,
+        registro_obra5: req.body.registro_obra5,
         data_emprestimo: req.body.data_emprestimo,
         data_prevista: req.body.data_prevista,
         data_devolucao1: req.body.data_devolucao1,
         data_devolucao2: req.body.data_devolucao2,
-        data_devolucao3: req.body.data_devolucao3
+        data_devolucao3: req.body.data_devolucao3,
+        data_devolucao4: req.body.data_devolucao4,
+        data_devolucao5: req.body.data_devolucao5
     };
 
     // Salva o emprestimo na base
@@ -98,7 +102,9 @@ const findSome = (req, res) => {
             { nome_usuario: { [Op.like]: `%${termo}%` } },
             { registro_obra1: { [Op.like]: `%${termo}%` } },
             { registro_obra2: { [Op.like]: `%${termo}%` } },
-            { registro_obra3: { [Op.like]: `%${termo}%` } }
+            { registro_obra3: { [Op.like]: `%${termo}%` } },
+            { registro_obra4: { [Op.like]: `%${termo}%` } },
+            { registro_obra5: { [Op.like]: `%${termo}%` } }
         ]
     } : null;
     Emprestimo.findAll({ limit, offset, where: condition })

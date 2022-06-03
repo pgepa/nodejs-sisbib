@@ -31,6 +31,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: true
         },
+        registro_obra4: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        registro_obra5: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         data_emprestimo: {
             type: DataTypes.DATEONLY,
             allowNull: false
@@ -48,6 +56,14 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: true
         },
         data_devolucao3: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        },
+        data_devolucao4: {
+            type: DataTypes.DATEONLY,
+            allowNull: true
+        },
+        data_devolucao5: {
             type: DataTypes.DATEONLY,
             allowNull: true
         }
