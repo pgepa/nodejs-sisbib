@@ -46,6 +46,8 @@ const pageNotFound = (req, res) => {
 
 // Retorna todos os usuarios
 const findAll = (req, res) => {
+    console.log('usuario.controller findAll()');
+    console.log('tentativa de acesso');
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
     const offset = (page - 1) * limit;
