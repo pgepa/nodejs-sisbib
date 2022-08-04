@@ -12,7 +12,7 @@ npm install
 
 ## Configuração
 
-É necessário criar um arquivo **.env** na raiz do projeto
+1. É necessário criar um arquivo **.env** na raiz do projeto
 
 ```bash
 PORT=3000
@@ -21,12 +21,18 @@ DB_USER=username
 DB_PASSWORD=password
 DB_NAME=esap
 ```
-Também é necessário criar uma base chamada **esap** no MySQL
+2. Também é necessário criar uma base chamada **esap** no MySQL
 
 ```bash
 CREATE DATABASE esap;
 ```
 para que o Sequelize crie as tabelas necessárias.
+
+3. No caso do servidor de produção, configurar o CORS:
+
+Backend: app.js
+
+Frontend: /src/services/apiurl.js
 
 ## License
 
