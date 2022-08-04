@@ -3,8 +3,8 @@
 const express = require('express');
 const authRoutes = express.Router();
 
-const verifySignUp = require('../middleware/verifySignUp');
 const authController = require('../controllers/auth.controller');
+const verifySignUp = require('../middleware/verifySignUp');
 
 authRoutes.post('/changenewpass', authController.changeNewPass);
 authRoutes.post('/changepass', authController.changePass);
