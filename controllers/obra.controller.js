@@ -66,6 +66,21 @@ const findAll = (req, res) => {
     });
 };
 
+const countRows = (req, res) => {
+  Obras.count().then((data) => {
+    const contagem = {
+      numLinhas: data
+    }
+    console.log(`contagem = ${contagem}`);
+    req.status(200).send(contagem);
+  })
+  .catch((err) => {
+    res.status(500).send({
+      message: err.message || 'Erro ao consultar a quantidade de obras'
+    })
+  });
+}
+
 // Retorna todas as obras
 const findReducedAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
@@ -170,5 +185,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, findAll, findReducedAll, findOne,
+module.exports = { create, findAll, countRows, findReducedAll, findOne,
     findSome, pageNotFound, update, exclude };
