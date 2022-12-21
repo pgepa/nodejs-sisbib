@@ -68,6 +68,17 @@ const findAll = (req, res) => {
     });
 };
 
+const count = (req, res) => {
+    Usuario.count().then((data) => {
+      req.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || 'Erro ao consultar a quantidade de usuarios'
+      })
+    });
+  }
+
 // Encontra um unico usuario na base
 const findOne = (req, res) => {
     const id = req.params.id;
@@ -170,5 +181,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, pageNotFound, findAll, findOne,
-    findSome, findNames, update, exclude };
+module.exports = { create, pageNotFound, findAll, count,
+    findOne, findSome, findNames, update, exclude };

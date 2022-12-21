@@ -9,6 +9,7 @@ const controller = require('../controllers/emprestimo.controller');
 emprestimosRouter.get('/all', [authJwt.verifyToken, authJwt.isAdmin], controller.findAll);
 emprestimosRouter.get('/404', controller.pageNotFound);
 emprestimosRouter.get('/:id', [authJwt.verifyToken, authJwt.isAdmin], controller.findOne);
+emprestimosRouter.get('/count', [authJwt.verifyToken, authJwt.isAdmin], controller.count);
 
 emprestimosRouter.post('/add', [authJwt.verifyToken, authJwt.isAdmin], controller.create);
 emprestimosRouter.post('/search', [authJwt.verifyToken, authJwt.isAdmin], controller.findSome);

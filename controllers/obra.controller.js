@@ -66,13 +66,9 @@ const findAll = (req, res) => {
     });
 };
 
-const countRows = (req, res) => {
+const count = (req, res) => {
   Obras.count().then((data) => {
-    const contagem = {
-      numLinhas: data
-    }
-    console.log(`contagem = ${contagem}`);
-    req.status(200).send(contagem);
+    req.status(200).send(data);
   })
   .catch((err) => {
     res.status(500).send({
@@ -185,5 +181,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, findAll, countRows, findReducedAll, findOne,
+module.exports = { create, findAll, count, findReducedAll, findOne,
     findSome, pageNotFound, update, exclude };

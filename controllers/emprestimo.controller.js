@@ -76,6 +76,17 @@ const findAll = (req, res) => {
     });
 };
 
+const count = (req, res) => {
+    Emprestimo.count().then((data) => {
+      req.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message || 'Erro ao consultar a quantidade de emprestimos'
+      })
+    });
+  }
+
 // Encontra um unico emprestimo
 const findOne = (req, res) => {
     const id = req.params.id;
@@ -154,5 +165,5 @@ const exclude = (req, res) => {
     });
 };
 
-module.exports = { create, pageNotFound, findAll, findOne, findSome,
-  update, exclude };
+module.exports = { create, pageNotFound, findAll, count,
+    findOne, findSome, update, exclude };

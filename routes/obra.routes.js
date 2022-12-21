@@ -10,6 +10,7 @@ obrasRouter.get('/all', controller.findAll);
 obrasRouter.get('/reducedall', controller.findReducedAll);
 obrasRouter.get('/404', controller.pageNotFound);
 obrasRouter.get('/:id', controller.findOne);
+obrasRouter.get('/count', controller.count);
 
 obrasRouter.post('/add', [authJwt.verifyToken, authJwt.isAdmin],
   controller.create);
