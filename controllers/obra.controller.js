@@ -67,7 +67,7 @@ const findAll = (req, res) => {
 };
 
 const count = (req, res) => {
-  Obras.count().then((data) => {
+  Obra.count().then((data) => {
     req.status(200).send({data});
   })
   .catch((err) => {
