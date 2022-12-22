@@ -11,10 +11,10 @@ usuariosRouter.get('/all', [authJwt.verifyToken, authJwt.isAdmin],
 usuariosRouter.get('/names', [authJwt.verifyToken, authJwt.isAdmin],
   controller.findNames);
 usuariosRouter.get('/404', controller.pageNotFound);
+usuariosRouter.get('/count', [authJwt.verifyToken, authJwt.isAdmin],
+  controller.count);
 usuariosRouter.get('/:id', [authJwt.verifyToken, authJwt.isAdmin],
   controller.findOne);
-  usuariosRouter.get('/count', [authJwt.verifyToken, authJwt.isAdmin],
-  controller.count);
 
 usuariosRouter.post('/search', [authJwt.verifyToken, authJwt.isAdmin],
   controller.findSome);
