@@ -70,7 +70,7 @@ const findAll = (req, res) => {
 
 const count = (req, res) => {
     Usuario.count().then((data) => {
-      req.status(200).send({data});
+      res.status(200).send({data});
     })
     .catch((err) => {
       res.status(500).send({
