@@ -1,3 +1,3 @@
 #!/bin/bash
-pm2 stop app.js
-pm2 start app.js
+pm2 stop nodejs-sisbib
+pm2 start --name nodeks-sisbib app.js
