@@ -13,7 +13,7 @@ const routes = require('./routes');
 global.__basedir = __dirname;
 db.sequelize.sync();
 app.use(cors({
-  origin: 'http://localhost:4000',
+  origin: 'http://' + process.env.URL + ':4000',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false
 }));
