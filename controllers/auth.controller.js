@@ -47,9 +47,11 @@ const signUp = (req, res) => {
 }
 
 const signIn = (req, res) => {
+  const email = (req.body.email || '').trim().toLowerCase();
+  const password = req.body.password || '';
   Usuario.findOne({
     where: {
-      email: req.body.email
+      email: email
     }
   })
     .then((user) => {
@@ -57,7 +59,7 @@ const signIn = (req, res) => {
         return res.status(404).send({ message: 'Usuário não encontrado.' });
       }
       const isValidPassword = bcrypt.compareSync(
-        req.body.password,
+        password,
         user.password
       );
       if (!isValidPassword) {
@@ -144,11 +146,12 @@ const changeNewPass = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'Usuário não encontrado.' });
       }
-      user.update({
+      return user.update({
         password: bcrypt.hashSync(req.body.newPassword, 8)
-      });
-      return res.status(200).send({
-        message: 'Senha alterada com sucesso.'
+      }).then(() => {
+        res.status(200).send({
+          message: 'Senha alterada com sucesso.'
+        });
       });
     })
     .catch((err) => {

@@ -1,19 +1,29 @@
 'use strict';
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 const express = require('express');
 const app = express();
 const cors = require('cors');
 
 const db = require('./models');
-const dotenv = require('dotenv');
 const path = require('path');
 
 const routes = require('./routes');
 
 global.__basedir = __dirname;
 db.sequelize.sync();
+
+const corsOrigins = [
+  'http://localhost:4000',
+  'http://127.0.0.1:4000',
+];
+if (process.env.URL) {
+  corsOrigins.push(`http://${process.env.URL}:4000`);
+}
 app.use(cors({
-  origin: 'http://' + process.env.URL + ':4000',
+  origin: corsOrigins,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false
 }));
@@ -23,8 +33,6 @@ app.use(express.static(publicFolder));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(routes);
-
-dotenv.config();
 
 const PORT = process.env.PORT || 3000;
 
