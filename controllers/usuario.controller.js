@@ -82,9 +82,20 @@ const count = (req, res) => {
 // Encontra um unico usuario na base
 const findOne = (req, res) => {
     const id = req.params.id;
-    Usuario.findByPk(id)
+    Usuario.findByPk(id, {
+        attributes: { exclude: ['password'] }
+    })
     .then((data) => {
-        res.status(200).send(data);
+        if (!data) {
+            return res.status(404).send({ message: 'Usuário não encontrado.' });
+        }
+        return data.getRoles().then((roles) => {
+            const plain = data.get({ plain: true });
+            res.status(200).send({
+                ...plain,
+                roles: roles.map((r) => r.name)
+            });
+        });
     })
     .catch((err) => {
         res.status(500).send({
@@ -140,29 +151,63 @@ const findNames = (req, res) => {
   });
 };
 
-// Atualiza um usuario
-const update = (req, res) => {
+// Atualiza um usuario (dados, senha opcional, perfis / roles)
+const update = async (req, res) => {
     const id = req.body.id;
-    Usuario.update(req.body, {
-        where: { id: id }
-    })
-    .then((rowsUpdated) => {
-      if (Number(rowsUpdated) > 0) {
-        res.send({
-          message: 'Usuário atualizado com sucesso.'
+    if (!id) {
+        return res.status(400).send({ message: 'ID do usuário é obrigatório.' });
+    }
+    try {
+        const user = await Usuario.findByPk(id);
+        if (!user) {
+            return res.status(404).send({ message: 'Usuário não encontrado.' });
+        }
+
+        const { roles, password, confirmPassword, ...raw } = req.body;
+        const allowed = ['inscription', 'name', 'department', 'cpf', 'email', 'phone'];
+        const updates = {};
+        for (const key of allowed) {
+            if (raw[key] !== undefined && raw[key] !== null) {
+                updates[key] = raw[key];
+            }
+        }
+
+        if (password !== undefined && password !== null && String(password).trim() !== '') {
+            updates.password = bcrypt.hashSync(String(password).trim(), 8);
+        }
+
+        if (Object.keys(updates).length > 0) {
+            await user.update(updates);
+        }
+
+        if (roles !== undefined && roles !== null) {
+            if (!Array.isArray(roles) || roles.length === 0) {
+                return res.status(400).send({
+                    message: 'Informe ao menos um perfil (user ou admin).'
+                });
+            }
+            for (let i = 0; i < roles.length; i++) {
+                if (!db.ROLES.includes(roles[i])) {
+                    return res.status(400).send({
+                        message: `Perfil inválido: ${roles[i]}`
+                    });
+                }
+            }
+            const Role = db.role;
+            const roleRows = await Role.findAll({
+                where: { name: { [Op.in]: roles } }
+            });
+            await user.setRoles(roleRows);
+        }
+
+        return res.status(200).send({
+            message: 'Usuário atualizado com sucesso.'
         });
-      }
-      else {
-        res.send({
-          message: 'Erro ao atualizar usuário.'
-        });
-      }
-    })
-    .catch((err) => {
-        res.status(500).send({
+    } catch (err) {
+        return res.status(500).send({
             message: err.message || 'Erro ao atualizar usuário.'
         });
-    });
+    }
 };
 
 // Exclui um usuário
