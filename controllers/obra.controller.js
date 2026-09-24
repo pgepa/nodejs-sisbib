@@ -119,22 +119,43 @@ const findSome = (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const offset = (page - 1) * limit;
     const termo = req.body.termo ? req.body.termo.trim() : '';
+    const filtro = req.body.filtro || 'todos';
 
     let condition = null;
     if (termo) {
         const words = termo.split(/\s+/).filter(Boolean);
         const andConditions = words.map((word) => {
-            const orList = [
-                { classificacao: { [Op.like]: `%${word}%` } },
-                { autor: { [Op.like]: `%${word}%` } },
-                { titulo: { [Op.like]: `%${word}%` } },
-                { descritores: { [Op.like]: `%${word}%` } },
-                { registro: { [Op.like]: `%${word}%` } },
-                { editor: { [Op.like]: `%${word}%` } },
-                { local_publicacao: { [Op.like]: `%${word}%` } }
-            ];
-            if (!isNaN(word) && Number.isInteger(Number(word))) {
-                orList.push({ ano: parseInt(word, 10) });
+            let orList = [];
+            if (filtro === 'titulo') {
+                orList.push({ titulo: { [Op.like]: `%${word}%` } });
+            } else if (filtro === 'autor') {
+                orList.push({ autor: { [Op.like]: `%${word}%` } });
+            } else if (filtro === 'registro') {
+                orList.push({ registro: { [Op.like]: `%${word}%` } });
+            } else if (filtro === 'classificacao') {
+                orList.push({ classificacao: { [Op.like]: `%${word}%` } });
+            } else if (filtro === 'descritores') {
+                orList.push({ descritores: { [Op.like]: `%${word}%` } });
+            } else if (filtro === 'editor') {
+                orList.push({ editor: { [Op.like]: `%${word}%` } });
+            } else if (filtro === 'ano') {
+                if (!isNaN(word) && Number.isInteger(Number(word))) {
+                    orList.push({ ano: parseInt(word, 10) });
+                }
+            } else {
+                // 'todos' (padrao)
+                orList = [
+                    { classificacao: { [Op.like]: `%${word}%` } },
+                    { autor: { [Op.like]: `%${word}%` } },
+                    { titulo: { [Op.like]: `%${word}%` } },
+                    { descritores: { [Op.like]: `%${word}%` } },
+                    { registro: { [Op.like]: `%${word}%` } },
+                    { editor: { [Op.like]: `%${word}%` } },
+                    { local_publicacao: { [Op.like]: `%${word}%` } }
+                ];
+                if (!isNaN(word) && Number.isInteger(Number(word))) {
+                    orList.push({ ano: parseInt(word, 10) });
+                }
             }
             return { [Op.or]: orList };
         });
