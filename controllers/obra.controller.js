@@ -115,22 +115,48 @@ const findOne = (req, res) => {
 
 // Consulta algumas obras de acordo com a condicao
 const findSome = (req, res) => {
-    const limit = parseInt(req.query.limit) || 20
-    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 20;
+    const page = parseInt(req.query.page) || 1;
     const offset = (page - 1) * limit;
-    const termo = req.body.termo;
-    const condition = termo ? {
-        [Op.or] : [
-            { classificacao: { [Op.like]: `%${termo}%` } },
-            { autor: { [Op.like]: `%${termo}%` } },
-            { titulo: { [Op.like]: `%${termo}%` } },
-            { descritores: { [Op.like]: `%${termo}%` }},
-            { registro: { [Op.like]: `%${termo}%` } }
+    const termo = req.body.termo ? req.body.termo.trim() : '';
+
+    let condition = null;
+    if (termo) {
+        const words = termo.split(/\s+/).filter(Boolean);
+        const andConditions = words.map((word) => {
+            const orList = [
+                { classificacao: { [Op.like]: `%${word}%` } },
+                { autor: { [Op.like]: `%${word}%` } },
+                { titulo: { [Op.like]: `%${word}%` } },
+                { descritores: { [Op.like]: `%${word}%` } },
+                { registro: { [Op.like]: `%${word}%` } },
+                { editor: { [Op.like]: `%${word}%` } },
+                { local_publicacao: { [Op.like]: `%${word}%` } }
+            ];
+            if (!isNaN(word) && Number.isInteger(Number(word))) {
+                orList.push({ ano: parseInt(word, 10) });
+            }
+            return { [Op.or]: orList };
+        });
+        condition = { [Op.and]: andConditions };
+    }
+
+    Obra.findAndCountAll({
+        limit,
+        offset,
+        where: condition,
+        order: [
+            [ 'id', 'DESC' ]
         ]
-    } : null;
-    Obra.findAll({ limit, offset, where: condition })
-    .then((data) => {
-        res.status(200).send(data);
+    })
+    .then((result) => {
+        res.set('x-total-count', result.count);
+        res.status(200).send({
+            data: result.rows,
+            totalItems: result.count,
+            totalPages: Math.ceil(result.count / limit),
+            currentPage: page
+        });
     })
     .catch((err) => {
         res.status(500).send({
