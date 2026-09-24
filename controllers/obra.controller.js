@@ -54,7 +54,7 @@ const findAll = (req, res) => {
         limit: limit,
         offset: offset,
         order: [
-            [ 'id', 'ASC' ]
+            [ 'id', 'DESC' ]
         ]
     }).then((data) => {
         res.status(200).send(data);
@@ -85,7 +85,10 @@ const findReducedAll = (req, res) => {
     Obra.findAll({
         attributes: ['id', 'classificacao', 'autor', 'titulo', 'descritores', 'registro'],
         limit: limit,
-        offset: offset
+        offset: offset,
+        order: [
+            [ 'id', 'DESC' ]
+        ]
     }).then((data) => {
         res.status(200).send(data);
     })
