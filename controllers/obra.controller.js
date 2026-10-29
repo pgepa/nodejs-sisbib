@@ -3,6 +3,7 @@
 const db = require('../models');
 const Obra = db.obra;
 const Op = db.Sequelize.Op;
+const { logChangeSafe } = require('../services/audit.service');
 
 // Cria e salvar uma nova obra
 const create = (req, res) => {
@@ -33,6 +34,12 @@ const create = (req, res) => {
     // Salva a obra na base
     Obra.create(obra)
         .then((data) => {
+            logChangeSafe({
+                action: 'CREATE',
+                entity: 'obra',
+                entityId: data.id,
+                details: { after: data },
+            });
             res.status(200).send({
                 data: data,
                 message: 'Obra cadastrada com sucesso.'
@@ -191,44 +198,61 @@ const pageNotFound = (req, res) => {
 };
 
 // Atualiza uma obra de acordo com o id da requisicao
-const update = (req, res) => {
+const update = async (req, res) => {
     const id = req.body.id;
-    Obra.update(req.body, {
-        where: { id: id },
-    })
-    .then((rowsUpdated) => {
-      if (Number(rowsUpdated) > 0) {
-        res.send({
-          message: 'Obra atualizada com sucesso.'
+    try {
+        const before = await Obra.findByPk(id);
+        const [rowsUpdated] = await Obra.update(req.body, {
+            where: { id: id },
         });
-      }
-      else {
-        res.send({
-          message: 'Erro ao atualizar obra.'
-        });
-      }
-    })
-    .catch((err) => {
+        if (Number(rowsUpdated) > 0) {
+            const after = await Obra.findByPk(id);
+            logChangeSafe({
+                action: 'UPDATE',
+                entity: 'obra',
+                entityId: id,
+                details: { before, after },
+            });
+            res.send({
+                message: 'Obra atualizada com sucesso.',
+            });
+        } else {
+            res.send({
+                message: 'Erro ao atualizar obra.',
+            });
+        }
+    } catch (err) {
         res.status(500).send({
-            message: err.message || 'Erro ao atualizar obra.'
+            message: err.message || 'Erro ao atualizar obra.',
         });
-    });
+    }
 };
 
 // Exclui uma obra de acordo com o id da requisicao
-const exclude = (req, res) => {
+const exclude = async (req, res) => {
     const id = req.params.id;
-    Obra.destroy({
-        where: { id: id },
-    })
-    .then(() => {
-        res.status(200).send('obra excluída com sucesso.');
-    })
-    .catch((err) => {
-        res.status(500).send({
-            message: `Não foi possível excluir a obra com ID = ${id}`
+    try {
+        const before = await Obra.findByPk(id);
+        const deleted = await Obra.destroy({
+            where: { id: id },
         });
-    });
+        if (!deleted) {
+            return res.status(404).send({
+                message: `Obra com ID = ${id} não encontrada.`,
+            });
+        }
+        logChangeSafe({
+            action: 'DELETE',
+            entity: 'obra',
+            entityId: id,
+            details: { before },
+        });
+        res.status(200).send({ message: 'Obra excluída com sucesso.' });
+    } catch (err) {
+        res.status(500).send({
+            message: `Não foi possível excluir a obra com ID = ${id}`,
+        });
+    }
 };
 
 module.exports = { create, findAll, count, findReducedAll, findOne,

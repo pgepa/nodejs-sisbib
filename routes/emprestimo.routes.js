@@ -15,6 +15,6 @@ emprestimosRouter.post('/add', [authJwt.verifyToken, authJwt.isAdmin], controlle
 emprestimosRouter.post('/search', [authJwt.verifyToken, authJwt.isAdmin], controller.findSome);
 emprestimosRouter.post('/update', [authJwt.verifyToken, authJwt.isAdmin], controller.update);
 
-emprestimosRouter.delete('/delete',[authJwt.verifyToken, authJwt.isAdmin], controller.exclude);
+emprestimosRouter.delete('/delete/:id',[authJwt.verifyToken, authJwt.isAdmin], controller.exclude);
 
 module.exports = emprestimosRouter;

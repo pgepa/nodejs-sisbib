@@ -20,7 +20,7 @@ usuariosRouter.post('/search', [authJwt.verifyToken, authJwt.isAdmin],
 usuariosRouter.post('/update', [authJwt.verifyToken, authJwt.isAdmin],
   controller.update);
 
-usuariosRouter.delete('/delete', [authJwt.verifyToken, authJwt.isAdmin],
+usuariosRouter.delete('/delete/:id', [authJwt.verifyToken, authJwt.isAdmin],
   controller.exclude);
 
 module.exports = usuariosRouter;

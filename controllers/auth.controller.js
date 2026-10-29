@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 const config = require('../config/auth.config');
 const db = require('../models');
 const jwt = require('jsonwebtoken');
+const { logChangeSafe } = require('../services/audit.service');
+const { setActor } = require('../services/auditContext');
 
 const Usuario = db.usuario;
 const Role = db.role;
@@ -21,6 +23,35 @@ const signUp = (req, res) => {
     password: bcrypt.hashSync(req.body.password, 8)
   })
     .then((user) => {
+      const finish = () => {
+        // Cadastro público: o próprio usuário é o ator
+        setActor({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        });
+        logChangeSafe({
+          action: 'CREATE',
+          entity: 'usuario',
+          entityId: user.id,
+          details: {
+            after: {
+              id: user.id,
+              inscription: user.inscription,
+              name: user.name,
+              email: user.email,
+              department: user.department,
+            },
+            source: 'auth.signup',
+          },
+          actor: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          },
+        });
+        res.send({ message: 'Usuário cadastrado com sucesso.' });
+      };
       if (req.body.roles) {
         Role.findAll({
           where: {
@@ -30,15 +61,11 @@ const signUp = (req, res) => {
           }
         })
           .then((roles) => {
-            user.setRoles(roles).then(() => {
-              res.send({ message: 'Usuário cadastrado com sucesso.' });
-            });
+            user.setRoles(roles).then(finish);
           });
       }
       else {
-        user.setRoles([1]).then(() => {
-          res.send({ message: 'Usuário cadastrado com sucesso.' });
-        });
+        user.setRoles([1]).then(finish);
       }
     })
     .catch((err) => {
@@ -127,6 +154,13 @@ const changePass = (req, res) => {
       user.update({
         password: bcrypt.hashSync(req.body.newPassword, 8)
       });
+      logChangeSafe({
+        action: 'UPDATE',
+        entity: 'usuario',
+        entityId: user.id,
+        details: { passwordChanged: true, source: 'auth.changepass' },
+        actor: { id: user.id, name: user.name, email: user.email },
+      });
       return res.status(200).send({
         message: 'Senha alterada com sucesso.'
       });
@@ -149,6 +183,13 @@ const changeNewPass = (req, res) => {
       return user.update({
         password: bcrypt.hashSync(req.body.newPassword, 8)
       }).then(() => {
+        logChangeSafe({
+          action: 'UPDATE',
+          entity: 'usuario',
+          entityId: user.id,
+          details: { passwordChanged: true, source: 'auth.changenewpass' },
+          actor: { id: user.id, name: user.name, email: user.email },
+        });
         res.status(200).send({
           message: 'Senha alterada com sucesso.'
         });

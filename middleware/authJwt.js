@@ -4,6 +4,7 @@ const config = require('../config/auth.config');
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Usuario = db.usuario;
+const { attachAuditActor } = require('./auditRequest');
 
 const verifyToken = (req, res, next) => {
     const header = req.headers.authorization;
@@ -23,9 +24,10 @@ const verifyToken = (req, res, next) => {
             return res.status(401).send({
                 message: 'Não autorizado.'
             });
-        }    
+        }
         req.userId = decoded.id;
-        next();
+        // Carrega ator para auditoria (ALS + req.user)
+        attachAuditActor(req, res, next);
     });
 };
 

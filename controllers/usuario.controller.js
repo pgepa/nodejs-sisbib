@@ -4,6 +4,7 @@ const db = require('../models');
 const Usuario = db.usuario;
 const Op = db.Sequelize.Op;
 const bcrypt = require('bcryptjs');
+const { logChangeSafe } = require('../services/audit.service');
 
 // Cria e salva um novo usuario
 const create = (req, res) => {
@@ -28,6 +29,12 @@ const create = (req, res) => {
     // Salva o usuario na base
     Usuario.create(usuario)
         .then((data) => {
+            logChangeSafe({
+                action: 'CREATE',
+                entity: 'usuario',
+                entityId: data.id,
+                details: { after: data },
+            });
             res.status(200).send({
                 data: data,
                 message: 'Usuário cadastrado com sucesso.'
@@ -163,6 +170,11 @@ const update = async (req, res) => {
             return res.status(404).send({ message: 'Usuário não encontrado.' });
         }
 
+        const before = {
+            ...user.toJSON(),
+            roles: (await user.getRoles()).map((r) => r.name),
+        };
+
         const { roles, password, confirmPassword, ...raw } = req.body;
         const allowed = ['inscription', 'name', 'department', 'cpf', 'email', 'phone'];
         const updates = {};
@@ -172,7 +184,9 @@ const update = async (req, res) => {
             }
         }
 
-        if (password !== undefined && password !== null && String(password).trim() !== '') {
+        const passwordChanged =
+            password !== undefined && password !== null && String(password).trim() !== '';
+        if (passwordChanged) {
             updates.password = bcrypt.hashSync(String(password).trim(), 8);
         }
 
@@ -200,6 +214,20 @@ const update = async (req, res) => {
             await user.setRoles(roleRows);
         }
 
+        const afterUser = await Usuario.findByPk(id);
+        const after = {
+            ...afterUser.toJSON(),
+            roles: (await afterUser.getRoles()).map((r) => r.name),
+            passwordChanged,
+        };
+
+        logChangeSafe({
+            action: 'UPDATE',
+            entity: 'usuario',
+            entityId: id,
+            details: { before, after },
+        });
+
         return res.status(200).send({
             message: 'Usuário atualizado com sucesso.'
         });
@@ -211,19 +239,30 @@ const update = async (req, res) => {
 };
 
 // Exclui um usuário
-const exclude = (req, res) => {
+const exclude = async (req, res) => {
     const id = req.params.id;
-    Usuario.destroy({
-        where: { id: id }
-    })
-    .then(() => {
-        res.status(200).send('Usuário excluído com sucesso.');
-    })
-    .catch((err) => {
-        res.status(500).send({
-            message: `Não foi possível excluir o usuário com ID=${id}`
+    try {
+        const before = await Usuario.findByPk(id);
+        const deleted = await Usuario.destroy({
+            where: { id: id },
         });
-    });
+        if (!deleted) {
+            return res.status(404).send({
+                message: `Usuário com ID=${id} não encontrado.`,
+            });
+        }
+        logChangeSafe({
+            action: 'DELETE',
+            entity: 'usuario',
+            entityId: id,
+            details: { before },
+        });
+        res.status(200).send({ message: 'Usuário excluído com sucesso.' });
+    } catch (err) {
+        res.status(500).send({
+            message: `Não foi possível excluir o usuário com ID=${id}`,
+        });
+    }
 };
 
 module.exports = { create, pageNotFound, findAll, count,

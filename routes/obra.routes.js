@@ -18,7 +18,7 @@ obrasRouter.post('/search', controller.findSome);
 obrasRouter.post('/update', [authJwt.verifyToken, authJwt.isAdmin],
   controller.update)
 
-obrasRouter.delete('/delete', [authJwt.verifyToken, authJwt.isAdmin],
+obrasRouter.delete('/delete/:id', [authJwt.verifyToken, authJwt.isAdmin],
   controller.exclude);
 
 module.exports = obrasRouter;

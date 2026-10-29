@@ -32,6 +32,10 @@ const publicFolder = path.join(__dirname,'public');
 app.use(express.static(publicFolder));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const { auditRequestContext } = require('./middleware/auditRequest');
+app.use(auditRequestContext);
+
 app.use(routes);
 
 const PORT = process.env.PORT || 3000;

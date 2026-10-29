@@ -6,6 +6,7 @@ const usuarioModel = require('./usuario.model');
 const emprestimoModel = require('./emprestimo.model');
 const roleModel = require('../models/role.model');
 const userRolesModel = require('../models/user_roles.model');
+const auditLogModel = require('./audit_log.model');
 
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = new Sequelize(
@@ -43,6 +44,7 @@ db.obra = obraModel(sequelize, DataTypes);
 db.emprestimo = emprestimoModel(sequelize, DataTypes);
 db.role = roleModel(sequelize, DataTypes);
 db.user_roles = userRolesModel(sequelize, DataTypes);
+db.audit_log = auditLogModel(sequelize, DataTypes);
 
 db.ROLES = ['user', 'admin'];
 

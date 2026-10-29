@@ -3,6 +3,7 @@
 const db = require('../models');
 const Emprestimo = db.emprestimo;
 const Op = db.Sequelize.Op;
+const { logChangeSafe } = require('../services/audit.service');
 
 // Cria e salva um novo usuario
 const create = (req, res) => {
@@ -36,6 +37,12 @@ const create = (req, res) => {
     // Salva o emprestimo na base
     Emprestimo.create(emprestimo)
         .then((data) => {
+            logChangeSafe({
+                action: 'CREATE',
+                entity: 'emprestimo',
+                entityId: data.id,
+                details: { after: data },
+            });
             res.status(200).send({
                 data: data,
                 message: 'Empréstimo registrado com sucesso.'
@@ -130,39 +137,57 @@ const findSome = (req, res) => {
 };
 
 // Atualiza um emprestimo
-const update = (req, res) => {
+const update = async (req, res) => {
     const id = req.body.id;
-    Emprestimo.update(req.body, {
-        where: { id: id }
-    })
-    .then((rowsUpdated) => {
-      if (Number(rowsUpdated) > 0) {
-        res.send({
-          message: 'Empréstimo atualizado com sucesso.'
+    try {
+        const before = await Emprestimo.findByPk(id);
+        const [rowsUpdated] = await Emprestimo.update(req.body, {
+            where: { id: id },
         });
-      }
-    })
-    .catch((err) => {
+        if (Number(rowsUpdated) > 0) {
+            const after = await Emprestimo.findByPk(id);
+            logChangeSafe({
+                action: 'UPDATE',
+                entity: 'emprestimo',
+                entityId: id,
+                details: { before, after },
+            });
+            res.send({
+                message: 'Empréstimo atualizado com sucesso.',
+            });
+        }
+    } catch (err) {
         res.status(500).send({
-            message: err.message
+            message: err.message,
         });
-    });
+    }
 };
 
 // Exclui um emprestimo
-const exclude = (req, res) => {
+const exclude = async (req, res) => {
     const id = req.params.id;
-    Emprestimo.destroy({
-        where: { id: id }
-    })
-    .then(() => {
-        res.status(200).send('Empréstimo excluído com sucesso.');
-    })
-    .catch((err) => {
-        res.status(500).send({
-            message: `Não foi possível excluir o empréstimo com ID=${id}`
+    try {
+        const before = await Emprestimo.findByPk(id);
+        const deleted = await Emprestimo.destroy({
+            where: { id: id },
         });
-    });
+        if (!deleted) {
+            return res.status(404).send({
+                message: `Empréstimo com ID=${id} não encontrado.`,
+            });
+        }
+        logChangeSafe({
+            action: 'DELETE',
+            entity: 'emprestimo',
+            entityId: id,
+            details: { before },
+        });
+        res.status(200).send({ message: 'Empréstimo excluído com sucesso.' });
+    } catch (err) {
+        res.status(500).send({
+            message: `Não foi possível excluir o empréstimo com ID=${id}`,
+        });
+    }
 };
 
 module.exports = { create, pageNotFound, findAll, count,
