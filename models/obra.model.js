@@ -39,6 +39,16 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: false
         },
+        exemplar: {
+            type: DataTypes.SMALLINT,
+            allowNull: false,
+            defaultValue: 1
+        },
+        volume: {
+            type: DataTypes.SMALLINT,
+            allowNull: false,
+            defaultValue: 1
+        },
         idioma: {
             type: DataTypes.STRING,
             allowNull: false

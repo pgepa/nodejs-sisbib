@@ -25,6 +25,8 @@ const create = (req, res) => {
         local_publicacao: req.body.local_publicacao,
         editor: req.body.editor,
         edicao: req.body.edicao,
+        exemplar: req.body.exemplar ?? 1,
+        volume: req.body.volume ?? 1,
         idioma: req.body.idioma,
         paginas: req.body.paginas,
         descritores: req.body.descritores,
