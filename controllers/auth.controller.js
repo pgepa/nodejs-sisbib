@@ -19,7 +19,7 @@ const signUp = (req, res) => {
     department: req.body.department,
     cpf: req.body.cpf,
     email: req.body.email,
-    phone: req.body.phone,
+    phone: req.body.phone || '987654321',
     password: bcrypt.hashSync(req.body.password, 8)
   })
     .then((user) => {
@@ -110,7 +110,7 @@ const signIn = (req, res) => {
           department: user.department,
           cpf: user.cpf,
           email: user.email,
-          phone: req.body.phone,
+          phone: user.phone,
           roles: authorities,
           accessToken: token,
           message: 'Usuário(a) autenticado(a) com sucesso.'
