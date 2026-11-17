@@ -4,55 +4,81 @@ const db = require('../models');
 const Emprestimo = db.emprestimo;
 const Op = db.Sequelize.Op;
 const { logChangeSafe } = require('../services/audit.service');
+const {
+    collectRegistros,
+    getRegistroStatus,
+    assertRegistrosEmprestaveis,
+    normalizeRegistro,
+} = require('../services/disponibilidade.service');
+const { notifyLoanCreated } = require('../services/loanMail.service');
 
-// Cria e salva um novo usuario
-const create = (req, res) => {
-    // Valida requisicao
-    if (!req.body.id_transacao) {
-        res.status(400).send({
-            message: 'ID da transação não pode ser vazio.'
+const disponibilidade = async (req, res) => {
+    try {
+        const registro = normalizeRegistro(req.query.registro);
+        const excludeEmprestimoId = req.query.excludeEmprestimoId;
+        const status = await getRegistroStatus(registro, { excludeEmprestimoId });
+        res.status(200).send(status);
+    } catch (err) {
+        res.status(500).send({
+            message: err.message || 'Erro ao consultar disponibilidade.',
         });
-        return;
+    }
+};
+
+// Cria e salva um novo empréstimo
+const create = async (req, res) => {
+    if (!req.body.id_transacao) {
+        return res.status(400).send({
+            message: 'ID da transação não pode ser vazio.',
+        });
     }
 
-    // Cria um  emprestimo
-    const emprestimo = {
-        id_transacao: req.body.id_transacao,
-        nome_funcionario: req.body.nome_funcionario,
-        nome_usuario: req.body.nome_usuario,
-        registro_obra1: req.body.registro_obra1,
-        registro_obra2: req.body.registro_obra2,
-        registro_obra3: req.body.registro_obra3,
-        registro_obra4: req.body.registro_obra4,
-        registro_obra5: req.body.registro_obra5,
-        data_emprestimo: req.body.data_emprestimo,
-        data_prevista: req.body.data_prevista,
-        data_devolucao1: req.body.data_devolucao1,
-        data_devolucao2: req.body.data_devolucao2,
-        data_devolucao3: req.body.data_devolucao3,
-        data_devolucao4: req.body.data_devolucao4,
-        data_devolucao5: req.body.data_devolucao5
-    };
+    try {
+        const registros = await assertRegistrosEmprestaveis(
+            collectRegistros(req.body)
+        );
 
-    // Salva o emprestimo na base
-    Emprestimo.create(emprestimo)
-        .then((data) => {
-            logChangeSafe({
-                action: 'CREATE',
-                entity: 'emprestimo',
-                entityId: data.id,
-                details: { after: data },
-            });
-            res.status(200).send({
-                data: data,
-                message: 'Empréstimo registrado com sucesso.'
-            });
-        })
-        .catch((err) => {
-            res.status(500).send({
-                message: err.message || 'Erro ao registrar empréstimo.'
-            });
+        const emprestimo = {
+            id_transacao: req.body.id_transacao,
+            nome_funcionario: req.body.nome_funcionario,
+            nome_usuario: req.body.nome_usuario,
+            registro_obra1: registros[0],
+            registro_obra2: registros[1] || null,
+            registro_obra3: registros[2] || null,
+            registro_obra4: registros[3] || null,
+            registro_obra5: registros[4] || null,
+            data_emprestimo: req.body.data_emprestimo,
+            data_prevista: req.body.data_prevista,
+            data_devolucao1: req.body.data_devolucao1 || null,
+            data_devolucao2: req.body.data_devolucao2 || null,
+            data_devolucao3: req.body.data_devolucao3 || null,
+            data_devolucao4: req.body.data_devolucao4 || null,
+            data_devolucao5: req.body.data_devolucao5 || null,
+        };
+
+        const data = await Emprestimo.create(emprestimo);
+        logChangeSafe({
+            action: 'CREATE',
+            entity: 'emprestimo',
+            entityId: data.id,
+            details: { after: data },
         });
+
+        const mail = await notifyLoanCreated(data.get({ plain: true }));
+        const message = mail.sent
+            ? `Empréstimo registrado com sucesso. Comprovante enviado para ${mail.to}.`
+            : `Empréstimo registrado com sucesso. E-mail não enviado: ${mail.reason}`;
+
+        res.status(200).send({
+            data,
+            message,
+            email: mail,
+        });
+    } catch (err) {
+        res.status(err.status || 500).send({
+            message: err.message || 'Erro ao registrar empréstimo.',
+        });
+    }
 };
 
 const pageNotFound = (req, res) => {
@@ -141,6 +167,23 @@ const update = async (req, res) => {
     const id = req.body.id;
     try {
         const before = await Emprestimo.findByPk(id);
+        if (!before) {
+            return res.status(404).send({
+                message: `Empréstimo com ID=${id} não encontrado.`,
+            });
+        }
+
+        // Only re-check availability when registro slots change (not on pure return).
+        const nextRegs = collectRegistros(req.body);
+        const prevRegs = collectRegistros(before.get({ plain: true }));
+        const registrosMudaram =
+            nextRegs.join('|') !== prevRegs.join('|');
+        if (registrosMudaram) {
+            await assertRegistrosEmprestaveis(nextRegs, {
+                excludeEmprestimoId: id,
+            });
+        }
+
         const [rowsUpdated] = await Emprestimo.update(req.body, {
             where: { id: id },
         });
@@ -155,9 +198,13 @@ const update = async (req, res) => {
             res.send({
                 message: 'Empréstimo atualizado com sucesso.',
             });
+        } else {
+            res.status(400).send({
+                message: 'Nenhuma alteração aplicada ao empréstimo.',
+            });
         }
     } catch (err) {
-        res.status(500).send({
+        res.status(err.status || 500).send({
             message: err.message,
         });
     }
@@ -190,5 +237,14 @@ const exclude = async (req, res) => {
     }
 };
 
-module.exports = { create, pageNotFound, findAll, count,
-    findOne, findSome, update, exclude };
+module.exports = {
+    create,
+    pageNotFound,
+    findAll,
+    count,
+    findOne,
+    findSome,
+    update,
+    exclude,
+    disponibilidade,
+};

@@ -58,15 +58,29 @@ const findAll = (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const page = parseInt(req.query.page) || 1
     const offset = (page - 1) * limit;
+    const Role = db.role;
     Usuario.findAll({
+        attributes: { exclude: ['password'] },
         limit: limit,
         offset: offset,
         order: [
             ['name', 'ASC']
-        ]
+        ],
+        include: [{
+            model: Role,
+            attributes: ['name'],
+            through: { attributes: [] },
+        }],
     })
     .then((data) => {
-        res.status(200).send(data);
+        res.status(200).send(
+            data.map((row) => {
+                const plain = row.get({ plain: true });
+                const roles = (plain.roles || []).map((r) => r.name);
+                delete plain.roles;
+                return { ...plain, roles };
+            })
+        );
     })
     .catch((err) => {
         res.status(500).send({
