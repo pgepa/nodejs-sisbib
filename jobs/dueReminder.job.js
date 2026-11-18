@@ -1,25 +1,16 @@
 'use strict';
 
 const cron = require('node-cron');
+const { sendDueRemindersForDate } = require('../services/loanMail.service');
 const {
-  sendDueRemindersForDate,
-  todayIsoBelem,
-} = require('../services/loanMail.service');
-
-const TIMEZONE = process.env.EMAIL_CRON_TZ || 'America/Belem';
-
-/** Library closed on weekends (Saturday=6, Sunday=0 in en-US short weekday). */
-function isWeekendInTz(timeZone = TIMEZONE) {
-  const weekday = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    weekday: 'short',
-  }).format(new Date());
-  return weekday === 'Sat' || weekday === 'Sun';
-}
+  TIMEZONE,
+  todayIso,
+  isWeekend,
+} = require('../services/serverTime.service');
 
 async function runDueReminderJob(label) {
-  const dueDate = todayIsoBelem();
-  if (isWeekendInTz()) {
+  const dueDate = todayIso();
+  if (isWeekend()) {
     console.log(
       `[cron:${label}] biblioteca fechada no fim de semana — lembretes não enviados (${dueDate}).`
     );
@@ -49,7 +40,9 @@ async function runDueReminderJob(label) {
 
 /**
  * 08:00 — first attempt (Mon–Fri only)
- * 09:00 — retry only for recipients not yet marked as sent (Mon–Fri only)
+ * 09:00 — retry for recipients not yet marked as sent
+ * 10:00 — third attempt for anyone still pending
+ * Times are evaluated against the server clock in TIMEZONE (APP_TZ / EMAIL_CRON_TZ).
  */
 function startDueReminderJobs() {
   if (String(process.env.EMAIL_CRON_DISABLED || '').toLowerCase() === 'true') {
@@ -73,8 +66,16 @@ function startDueReminderJobs() {
     { timezone: TIMEZONE }
   );
 
+  cron.schedule(
+    '0 10 * * 1-5',
+    () => {
+      void runDueReminderJob('10h');
+    },
+    { timezone: TIMEZONE }
+  );
+
   console.log(
-    `[cron] lembretes de devolução agendados às 08:00 e 09:00, seg–sex (${TIMEZONE})`
+    `[cron] lembretes de devolução agendados às 08:00, 09:00 e 10:00, seg–sex (${TIMEZONE})`
   );
 }
 

@@ -10,6 +10,11 @@ emprestimosRouter.get('/all', [authJwt.verifyToken, authJwt.isAdmin], controller
 emprestimosRouter.get('/404', controller.pageNotFound);
 emprestimosRouter.get('/count', controller.count);
 emprestimosRouter.get(
+  '/server-time',
+  [authJwt.verifyToken, authJwt.isAdmin],
+  controller.serverTime
+);
+emprestimosRouter.get(
   '/disponibilidade',
   [authJwt.verifyToken, authJwt.isAdmin],
   controller.disponibilidade

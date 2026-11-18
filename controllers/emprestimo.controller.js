@@ -14,6 +14,14 @@ const {
     notifyLoanCreated,
     notifyReturnReceipt,
 } = require('../services/loanMail.service');
+const {
+    getServerTimePayload,
+    makeTransactionId,
+} = require('../services/serverTime.service');
+
+const serverTime = (req, res) => {
+    res.status(200).send(getServerTimePayload());
+};
 
 const disponibilidade = async (req, res) => {
     try {
@@ -30,19 +38,16 @@ const disponibilidade = async (req, res) => {
 
 // Cria e salva um novo empréstimo
 const create = async (req, res) => {
-    if (!req.body.id_transacao) {
-        return res.status(400).send({
-            message: 'ID da transação não pode ser vazio.',
-        });
-    }
-
     try {
         const registros = await assertRegistrosEmprestaveis(
             collectRegistros(req.body)
         );
 
+        // Always stamp transaction id from the server clock (library TZ).
+        const id_transacao = makeTransactionId();
+
         const emprestimo = {
-            id_transacao: req.body.id_transacao,
+            id_transacao,
             nome_funcionario: req.body.nome_funcionario,
             nome_usuario: req.body.nome_usuario,
             registro_obra1: registros[0],
@@ -262,4 +267,5 @@ module.exports = {
     update,
     exclude,
     disponibilidade,
+    serverTime,
 };

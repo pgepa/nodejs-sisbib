@@ -7,6 +7,7 @@ const {
   recordEmailSent,
   recordEmailFailure,
 } = require('./emailLog.service');
+const { todayIso } = require('./serverTime.service');
 
 const SLOTS = [1, 2, 3, 4, 5];
 
@@ -26,10 +27,9 @@ function formatDateBR(iso) {
   return `${m[3]}/${m[2]}/${m[1]}`;
 }
 
+/** @deprecated use todayIso from serverTime.service — kept as alias for callers. */
 function todayIsoBelem() {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Belem',
-  }).format(new Date());
+  return todayIso();
 }
 
 function openSlots(emprestimo) {
