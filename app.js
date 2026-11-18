@@ -42,4 +42,10 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Servidor em execução na porta ${PORT}`);
+  try {
+    const { startDueReminderJobs } = require('./jobs/dueReminder.job');
+    startDueReminderJobs();
+  } catch (err) {
+    console.error('[cron] não foi possível iniciar lembretes de devolução:', err);
+  }
 });

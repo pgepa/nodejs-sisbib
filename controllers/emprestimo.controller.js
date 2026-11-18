@@ -10,7 +10,10 @@ const {
     assertRegistrosEmprestaveis,
     normalizeRegistro,
 } = require('../services/disponibilidade.service');
-const { notifyLoanCreated } = require('../services/loanMail.service');
+const {
+    notifyLoanCreated,
+    notifyReturnReceipt,
+} = require('../services/loanMail.service');
 
 const disponibilidade = async (req, res) => {
     try {
@@ -184,19 +187,31 @@ const update = async (req, res) => {
             });
         }
 
+        const beforePlain = before.get({ plain: true });
         const [rowsUpdated] = await Emprestimo.update(req.body, {
             where: { id: id },
         });
         if (Number(rowsUpdated) > 0) {
             const after = await Emprestimo.findByPk(id);
+            const afterPlain = after.get({ plain: true });
             logChangeSafe({
                 action: 'UPDATE',
                 entity: 'emprestimo',
                 entityId: id,
                 details: { before, after },
             });
+
+            const mail = await notifyReturnReceipt(beforePlain, afterPlain);
+            let message = 'Empréstimo atualizado com sucesso.';
+            if (mail.sent) {
+                message = `Empréstimo atualizado com sucesso. Comprovante de devolução enviado para ${mail.to}.`;
+            } else if (mail.reason && !mail.skipped) {
+                message = `Empréstimo atualizado com sucesso. E-mail de devolução não enviado: ${mail.reason}`;
+            }
+
             res.send({
-                message: 'Empréstimo atualizado com sucesso.',
+                message,
+                email: mail,
             });
         } else {
             res.status(400).send({
